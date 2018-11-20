@@ -184,6 +184,115 @@ sub Test11 init called
 
     //局部函数
     test13()
+
+    //尾函数, 标记该递归函数，并将其自身调用作为它执行的最后一个操作
+    println("tailrec fun: ${count(2)}")
+
+    /*
+    中缀函数
+    infix
+    它们必须是成员函数或扩展函数；
+    它们必须只有一个参数；
+    其参数不得接受可变数量的参数。
+     */
+    //调用
+    var str = "hello world"
+    //不使用中缀表示法
+    println(str.removeLetter("h")) //输出ello world
+    //使用中缀表示法
+    println("infix: ${str removeLetter "d"}")  //输出hello worl
+    //使用中缀表示法调用str removeLetter "d"等同于调用str.removeLetter("d")
+    //还可以连续调用
+    println(str.removeLetter("h").removeLetter("d").removeLetter("l")) // 输出 eo wor
+    println("infix: ${str removeLetter "h" removeLetter "d" removeLetter "l"}") // 输出 eo wor
+
+    /*
+    Lambda 表达式总是括在大括号中；
+其参数（如果有的话）在 -> 之前声明（参数类型可以省略）；
+函数体（如果存在的话）在 -> 后面。
+     */
+    //这是一个Lambda表达式的完整语法形式
+    val sum = { x: Int, y: Int -> x + y } // 其他写法: val sum: (Int, Int) -> Int = { x, y -> x + y }
+//Lambda表达式在大括号中
+//参数 x 和 y 在 -> 之前声明
+//参数声明放在大括号内，并有参数类型标注
+//函数体 x + y 在 -> 后面
+    println("lamba, { x: Int, y: Int -> x + y }: ${sum(1, 2)}") //输出结果为 3
+
+    val getInt: (Int) -> Int = { x -> x + 1 }
+    val sum2: (Int) -> Int = { it + 1 } //并且将隐含地奖这个参数命名为 it
+
+    var sum3: (Int) -> Int = {
+        val i: Int = it + 1
+        val j: Int = i + 3
+        val k: Int = it + j - i
+        i
+        k
+        j
+    }
+    println("""
+        lamba sum3:
+        (Int) -> Int = {
+        val i: Int = it + 1
+        val j: Int = i + 3
+        val k: Int = it + j - i
+        i
+        k
+        j
+        : ${sum3(1)}
+    """ )
+
+    //高阶lamba
+    println("lamba fun inject: ${printName("Name:", ::getName)}")
+    println(printName("lamba fun 2: Name:", { name -> getName("Czh") }))
+    println(printName("lamba fun 3: Name:") { name -> getName("Czh") })
+
+    //匿名函数
+    println("annoymous fun: " + printName("Name:", fun(str: String): String { return "Czh" }))
+
+    /*
+    内联函数
+    使用高阶函数会带来一些运行时的效率损失。每一个函数都是一个对象，并且会捕获一个闭包。
+     即那些在函数体内会访问到的变量。 内存分配（对于函数对象和类）和虚拟调用会引入运行时间开销。
+     这时可以通过内联函数消除这类的开销
+     */
+    fun printName(a: String, name: (str: String) -> String): String {
+        var str = "$a${name("Czh")}"
+        return str
+    }
+
+    println(printName("inner connection fun: "+"Name:", { name -> getName("Czh") }))
+
+    // inline fun 使用
+    println("inline fun:" + printName2("Name:", { name -> getName("Czh") }))
+
+    // inline attributes
+
+    // 函数扩展
+    val mutableList = mutableListOf(1, 2, 3)
+    mutableList.swap(1, 2) //调用扩展函数swap()
+    println("""fun expand
+        fun MutableList<Int>.swap(index1:Int, index2:Int) {
+    val tmp = this[index1] // this is the mutable list
+    this[index1] = this[index2]
+    this[index2] = tmp
+        }
+        swap:""" + mutableList)
+
+    // 如果扩展和内部函数名冲突，优先使用内部函数
+    var a1 = null
+    var b1 = "not null"
+    println("""
+       fun Any?.toString():String{
+    if (this == null) return "null string"
+    return toString()
+}, test:""" + a1.toString() + ", test2:" + b1.toString())
+
+
+    // 伴生对象
+    println("companion obj: " + Test16.foo())
+
+
 }
 
 // 函数定义
@@ -347,4 +456,76 @@ fun test13() {
         println("test14")
     }
     test14()
+}
+
+//尾函数
+tailrec fun count(x: Int = 1): Int = if (x == 10) x else count(x - 1)
+
+//扩展函数
+infix fun String.removeLetter(str: String): String {
+    //this指调用者
+    return this.replace(str, "")
+}
+
+/*
+lamba 高阶使用
+函数注入,函数作为参数传入高阶函数，需要在该函数前加两个冒号::作为标记
+Kotlin提供了Lambda表达式来让我们更方便地传递函数参数值。Lambda表达式总是被大括号括着；
+如果有参数的话，其参数在 -> 之前声明，参数类型可以省略；如果存在函数体的话，函数体在-> 后面
+*/
+
+fun getName(name: String): String {
+    return name
+}
+
+fun printName(a: String, name: (str: String) -> String): String {
+    var str = "$a${name("Czh")}"
+    return str
+}
+
+/*
+printName函数有一个函数类型的参数，通过Lambda表达式向printName函数传入参数值，
+Kotlin编译器会为Lambda表达式单独创建一个对象，再将Lambda表达式转换为相应的函数并调用。
+如果这种情况出现比较多的时候，就会很消耗资源。这是可以在函数前使用inline关键字，把Lambda函数内联到调用处
+ */
+inline fun printName2(a: String, name: (str: String) -> String): String {
+    var str = "$a${name("Czh")}"
+    return str
+}
+
+/*
+函数扩展
+ */
+fun MutableList<Int>.swap(index1:Int, index2:Int) {
+    val tmp = this[index1] // this is the mutable list
+    this[index1] = this[index2]
+    this[index2] = tmp
+}
+
+//空接收类型
+fun Any?.toString():String{
+    if (this == null) return "null string"
+    return toString()
+}
+
+// 扩展属性
+class Test15 {
+    // public 否则扩展属性不能访问
+    var myVal = 0
+}
+var Test15.value :Int
+    get() = myVal
+    set(value) {
+        myVal = value
+    }
+// 扩展属性的适用性在哪里？肯定不是这样，都已经public了，完全不需要一个额外的壳子
+
+// 扩展伴生对象
+class Test16 {
+    companion object {
+
+    }
+}
+fun Test16.Companion.foo() {
+    println("companion obj expand")
 }
