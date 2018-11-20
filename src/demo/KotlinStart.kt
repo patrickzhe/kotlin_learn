@@ -292,6 +292,14 @@ sub Test11 init called
     // 伴生对象
     println("companion obj: " + Test16.foo())
 
+    // class 内部fun 扩展
+    println("-----------------")
+    println("class fun expand in other class: ")
+    Test18().test(Test17())
+    println("-----------------")
+    println("class fun expand in other class then override in subclass: ")
+    Test19().test(Test17())
+    println("-----------------")
 
 }
 
@@ -519,7 +527,7 @@ var Test15.value :Int
         myVal = value
     }
 // 扩展属性的适用性在哪里？肯定不是这样，都已经public了，完全不需要一个额外的壳子
-
+// 对于不同包的对象的扩展，需要import
 // 扩展伴生对象
 class Test16 {
     companion object {
@@ -529,3 +537,38 @@ class Test16 {
 fun Test16.Companion.foo() {
     println("companion obj expand")
 }
+// class 内部扩展其他class的
+class Test17 {
+    fun test17() {
+        println("test 17 print")
+    }
+}
+open class Test18 {
+    fun test18() {
+        println("test 18 print")
+    }
+    open fun Test17.test17_2() {
+        test17()
+        // call Test18 fun using this@ClassName
+        this@Test18.test18() // more like decoration pattern or proxy?
+    }
+
+    open fun test(test17 : Test17) {
+        test17.test17_2()
+    }
+}
+// 扩展的fun 都可以在subclass中override, 只要open了
+class Test19 : Test18() {
+    override fun Test17.test17_2() {
+        println("call test17 test17_2 in Test19")
+        test17()
+        println("call test18 test18() in Test19")
+        this@Test19.test18()
+    }
+
+    override fun test(test17 : Test17) {
+        println("call test in Test19")
+        test17.test17_2()
+    }
+}
+
