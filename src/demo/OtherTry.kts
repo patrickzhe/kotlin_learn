@@ -1,3 +1,5 @@
+import java.lang.Integer.parseInt
+
 data class User(var name : String, var age :Int)
 
 var user = User("zhe", 22)
@@ -25,11 +27,13 @@ for ((key, value) in map) {
 
 
 // 区间Range
-if ( i in 1..5) {
+var i1 = 1
+if ( i1 in 1..5) {
     println("i in 1-5")
+    i1++
 }
-
-if ( i !in 1..5) {
+var i2 = 0
+if ( i2 !in 1..5) {
     println("i not in 1-5")
 }
 
@@ -47,11 +51,11 @@ for (i in 1 until 5) println(i)
 
 
 // 类型检查 is
-var a: Any = "a"
-if (a is String) {
+var a1: Any = "a"
+if (a1 is String) {
     println("a是String类型")
 }
-if (a !is Int) {
+if (a1 !is Int) {
     println("a不是Int类型")
 }
 
@@ -62,13 +66,13 @@ val 属性——如果属性是 private 或 internal，或者该检查在声明
 var 局部变量——如果变量在检查和使用之间没有修改、没有在会修改它的 lambda 中捕获、并且不是局部委托属性；
 var 属性——决不可能（因为该变量可以随时被其他代码修改）
  */
-var a: Any = "a"
-println(a.length) // a 自动转换为String类型
+val a2: Any = "a"
+//println(a2.length) // a 自动转换为String类型
 
 // when
-when(a){
-    is String -> a.length
-    is Int -> a + 1
+when(a2){
+    is String -> a2.length
+    is Int -> a2 + 1
 }
 
 //强制转换 , as
@@ -76,9 +80,9 @@ var any: Any = "abc"
 var str: String = any as String
 
 // null 转换, 用?
-var str = null
+var str1 = null
 // var str2 = str as String // error
-var str2 = str as? String // ok, as?可以在转换失败时返回null，避免了抛出异常
+var str2 = str1 as? String // ok, as?可以在转换失败时返回null，避免了抛出异常
 
 // this
 /*
@@ -115,16 +119,16 @@ equals or ==  用来判断结构相等
 === 判断引用相等
 
  */
-var a = User("Czh", 22)
-var b = User("Czh", 22)
-var c = b
-var d = a
-if (c == d) {
+var a3 = User("Czh", 22)
+var b1 = User("Czh", 22)
+var c1 = b1
+var d1 = a3
+if (c1 == d1) {
     println("a 和 b 结构相等")
 } else {
     println("a 和 b 结构不相等")
 }
-if (c === d) {
+if (c1 === d1) {
     println("a 和 b 引用相等")
 } else {
     println("a 和 b 引用不相等")
@@ -141,8 +145,8 @@ operator fun String.unaryPlus(): String {
 }
 
 //调用
-var a = "a"
-println(+a)  //输出结果为：aa
+var a4 = "a"
+println(+a4)  //输出结果为：aa
 /*
 当编译器处理例如表达式 +a 时，它执行以下步骤：
 
@@ -223,15 +227,15 @@ a <= b	a.compareTo(b) <= 0
  */
 
 // 在 Kotlin 中，类型系统区分一个引用可以容纳 null （可空引用）还是不能容纳（非空引用）。 例如，String 类型的常规变量不能容纳 null：
-var a = "a"
-a = null  // compile err
+var a5 = "a"
+//a5 = null  // compile err
 
 // 可以用?
-var b : String? = "b"
-b = null
+var b2 : String? = "b"
+b2 = null
 
 //调用
-b?.length // 避免空指针
+b2?.length // 避免空指针
 
 // Bob?.department?.head?.name
 
@@ -253,23 +257,23 @@ val intList: List<Int> = nullableList.filterNotNull()
 // 这两行代码表达的都是“如果b不等于null，i = b.length;如果b等于null,i = -1”。第一行代码用的是if表达式，而第二行代码使用了Elvis操作符，写作?:。
 // Elvis操作符表示如果?:左侧表达式非空，就使用左侧表达式，否则使用右侧表达式。
 //请注意，因为throw和return在Kotlin中都是表达式，所以它们也可以用在Elvis操作符右侧
-val i: Int = if (b != null) b.length else -1
-val i = b?.length ?: -1
-fun foo(node: Node): String? {
+val i: Int = if (b2 != null) b2!!.length else -1
+val i = b2?.length ?: -1
+/*fun foo(node: Node): String? {
     val parent = node.getParent() ?: return null
     val name = node.getName() ?: throw IllegalArgumentException("name expected")
     // ……
-}
+}*/
 
 // !!操作符将任何值转换为非空类型，若该值为空则抛出异常。如下所示：
-var a = null
-a!!
+var a6 = null
+a6!!
 
 
 // exception
 // try catch
 val a: Int? = try {
-    parseInt(input)
+    parseInt("1a00")
 } catch (e: NumberFormatException) {
     null
 }
