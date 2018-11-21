@@ -1,4 +1,5 @@
 import java.lang.Integer.parseInt
+import java.lang.NullPointerException
 
 data class User(var name : String, var age :Int)
 
@@ -257,29 +258,13 @@ val intList: List<Int> = nullableList.filterNotNull()
 // 这两行代码表达的都是“如果b不等于null，i = b.length;如果b等于null,i = -1”。第一行代码用的是if表达式，而第二行代码使用了Elvis操作符，写作?:。
 // Elvis操作符表示如果?:左侧表达式非空，就使用左侧表达式，否则使用右侧表达式。
 //请注意，因为throw和return在Kotlin中都是表达式，所以它们也可以用在Elvis操作符右侧
-val i: Int = if (b2 != null) b2!!.length else -1
-val i = b2?.length ?: -1
+val i3: Int = if (b2 != null) b2!!.length else -1
+val i4 = b2?.length ?: -1
 /*fun foo(node: Node): String? {
     val parent = node.getParent() ?: return null
     val name = node.getName() ?: throw IllegalArgumentException("name expected")
     // ……
 }*/
-
-// !!操作符将任何值转换为非空类型，若该值为空则抛出异常。如下所示：
-var a6 = null
-a6!!
-
-
-// exception
-// try catch
-val a: Int? = try {
-    parseInt("1a00")
-} catch (e: NumberFormatException) {
-    null
-}
-
-// try表达式的返回值是 try块中的最后一个表达式或者是catch块中的最后一个表达式。finally块中的内容不会影响表达式的结果。
-
 
 // 类型别名
 // typealias
@@ -292,7 +277,28 @@ println(getLength(l)) //输出结果为：3
 
 typealias MyType = (String, Int, Any, MutableList<String> ) -> Unit
 //当我们使用的时候
-var myType:MyType
+// var myType:MyType  // compile err must be initialized
 //而不需要写他原来的类型
 //var myType：(String, Int, Any, MutableList<String> ) -> Unit
+
+// !!操作符将任何值转换为非空类型，若该值为空则抛出异常。如下所示：
+var a6 = null
+try {
+    a6!!
+} catch (e : NullPointerException) {
+    println("NullPointerException from a6!!")
+    null
+}
+
+
+// exception
+// try catch
+val a: Int? = try {
+    parseInt("1a00")
+} catch (e: NumberFormatException) {
+    null
+}
+
+// try表达式的返回值是 try块中的最后一个表达式或者是catch块中的最后一个表达式。finally块中的内容不会影响表达式的结果。
+
 
